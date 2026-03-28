@@ -1,0 +1,13 @@
+target/
+.DS_Store
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS files
+Thumbs.db
+
+# Logs
+*.log
