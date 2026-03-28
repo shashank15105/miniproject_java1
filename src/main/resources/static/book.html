@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Working Space | Book Workspace</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">
+            <span class="brand-mark">CW</span>
+            <div>
+                <h1>Co-Working Space Management</h1>
+                <p>Reserve a workspace by user, time slot, and location.</p>
+            </div>
+        </div>
+        <nav class="navbar">
+            <a href="/index.html">Workspaces</a>
+            <a class="active" href="/book.html">Book</a>
+            <a href="/bookings.html">My Bookings</a>
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        <section class="panel hero accent-book">
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <span class="eyebrow">New reservation</span>
+                    <h2>Book a workspace</h2>
+                    <p>Sample users are already available, including <strong>U1</strong> and <strong>U2</strong>. Choose a time slot and confirm in seconds.</p>
+                </div>
+                <aside class="hero-aside compact-aside">
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Try user</span>
+                        <strong>U1</strong>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Popular workspace</span>
+                        <strong>W1</strong>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="booking-layout">
+            <article class="panel form-panel">
+                <div class="section-title">
+                    <h3>Reservation Details</h3>
+                    <p>Select your workspace, choose a valid time slot, and review the live price before confirming.</p>
+                </div>
+                <form id="booking-form" class="booking-form-grid">
+                    <div class="form-section">
+                        <div class="section-kicker">User</div>
+                        <label>
+                            Full Name
+                            <input type="text" id="name" placeholder="Enter your name" required>
+                        </label>
+                        <label>
+                            Email Address
+                            <input type="email" id="email" placeholder="Optional email for faster lookup">
+                        </label>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-kicker">Workspace</div>
+                        <label>
+                            Select Workspace
+                            <select id="workspaceId" required>
+                                <option value="">Loading workspaces...</option>
+                            </select>
+                        </label>
+                        <div id="workspace-details" class="workspace-selection-card">
+                            <div class="workspace-selection-empty">Choose a workspace to see price, location, and remaining seats.</div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-kicker">Schedule</div>
+                        <div class="time-grid">
+                            <label>
+                                Start Time
+                                <input type="datetime-local" id="startTime" required>
+                            </label>
+                            <label>
+                                End Time
+                                <input type="datetime-local" id="endTime" required>
+                            </label>
+                        </div>
+                        <p class="field-note">Minimum duration is 1 hour and end time must be after start time.</p>
+                    </div>
+
+                    <div class="booking-preview">
+                        <div class="preview-row">
+                            <span>Duration</span>
+                            <strong id="durationPreview">1 hour</strong>
+                        </div>
+                        <div class="preview-row">
+                            <span>Hourly Rate</span>
+                            <strong id="ratePreview">Rs 0/hr</strong>
+                        </div>
+                        <div class="preview-row">
+                            <span>Estimated Total</span>
+                            <strong id="totalPreview">Rs 0</strong>
+                        </div>
+                    </div>
+
+                    <button id="booking-submit" type="submit" class="primary-button">Confirm Booking</button>
+                </form>
+                <div id="booking-validation" class="inline-validation hidden"></div>
+                <div id="booking-message" class="message hidden"></div>
+            </article>
+
+            <aside class="panel info-panel">
+                <span class="eyebrow">Booking Tips</span>
+                <h3>Better booking flow</h3>
+                <ul class="info-list">
+                    <li>Enter your name and optional email. The system will find or create your user automatically.</li>
+                    <li>Workspaces load automatically from the live API and show remaining seats.</li>
+                    <li>The confirm button stays disabled until the time slot is valid.</li>
+                </ul>
+
+                <div class="assist-card">
+                    <span class="assist-label">Live guidance</span>
+                    <p id="assistMessage">Select a workspace to start your booking.</p>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <script src="/js/book.js"></script>
+</body>
+</html>

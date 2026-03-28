@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Working Space | My Bookings</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">
+            <span class="brand-mark">CW</span>
+            <div>
+                <h1>Co-Working Space Management</h1>
+                <p>Review all reservations linked to a user account.</p>
+            </div>
+        </div>
+        <nav class="navbar">
+            <a href="/index.html">Workspaces</a>
+            <a href="/book.html">Book</a>
+            <a class="active" href="/bookings.html">My Bookings</a>
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        <section class="panel hero accent-history">
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <span class="eyebrow">History</span>
+                    <h2>Check booking history</h2>
+                    <p>Your latest booking profile is remembered automatically, so this page can load your history without asking for internal IDs.</p>
+                </div>
+                <aside class="hero-aside compact-aside">
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Lookup</span>
+                        <strong>Auto-linked profile</strong>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Refresh</span>
+                        <strong>Latest booking instantly</strong>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="panel search-panel">
+            <div class="saved-user-shell">
+                <div class="saved-user-card">
+                    <span class="section-kicker">Current Profile</span>
+                    <h3 id="savedUserName">No recent booking user</h3>
+                    <p id="savedUserMeta">Book a workspace first and this page will load your bookings automatically.</p>
+                </div>
+                <button id="load-history-button" type="button" class="primary-button">Load My Bookings</button>
+            </div>
+            <div id="history-message" class="message hidden"></div>
+        </section>
+
+        <section class="panel table-panel">
+            <div class="section-title">
+                <h3>Booking Records</h3>
+                <p>Bookings are loaded directly from the coworking booking API.</p>
+            </div>
+            <div class="table-shell">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Workspace ID</th>
+                            <th>Workspace</th>
+                            <th>Location</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-results">
+                        <tr>
+                            <td colspan="7" class="empty-cell">Your recent booking history will appear here automatically.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="/js/bookings.js"></script>
+</body>
+</html>

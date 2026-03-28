@@ -1,0 +1,12 @@
+com/coworking/config/DatabaseManager.class
+com/coworking/dao/WorkspaceDao.class
+com/coworking/controller/WorkspaceController.class
+com/coworking/config/DatabaseProperties.class
+com/coworking/config/DatabaseInitializer.class
+com/coworking/model/Workspace.class
+com/coworking/model/BookingResponse.class
+com/coworking/service/WorkspaceService.class
+com/coworking/model/BookingRecord.class
+com/coworking/model/BookingRequest.class
+com/coworking/web/CoworkingSpaceApplication.class
+com/coworking/model/UserRecord.class

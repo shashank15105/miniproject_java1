@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Working Space | Explore Workspaces</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">
+            <span class="brand-mark">CW</span>
+            <div>
+                <h1>Co-Working Space Management</h1>
+                <p>Browse workspaces, reserve seats, and manage your bookings.</p>
+            </div>
+        </div>
+        <nav class="navbar">
+            <a class="active" href="/index.html">Workspaces</a>
+            <a href="/book.html">Book</a>
+            <a href="/bookings.html">My Bookings</a>
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        <section class="panel hero">
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <span class="eyebrow">Available today</span>
+                    <h2>Find a desk or room that fits your day</h2>
+                    <p>Live inventory is pulled directly from the local Spring Boot API and designed for quick, low-friction booking.</p>
+                    <div class="hero-actions">
+                        <button id="refresh-workspaces" class="primary-button" type="button">Refresh Workspaces</button>
+                        <a class="secondary-button" href="/bookings.html">View My Bookings</a>
+                    </div>
+                </div>
+                <aside class="hero-aside">
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Best for</span>
+                        <strong>Daily desks</strong>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Quick action</span>
+                        <strong>One-click booking</strong>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Live status</span>
+                        <strong>Seats update instantly</strong>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="strip-grid">
+            <article class="strip-card">
+                <span class="strip-title">Hot Cities</span>
+                <p>Mumbai and Bengaluru are seeded and ready for demo bookings.</p>
+            </article>
+            <article class="strip-card">
+                <span class="strip-title">Pricing Model</span>
+                <p>Hourly rates are shown upfront so users can estimate cost before booking.</p>
+            </article>
+            <article class="strip-card">
+                <span class="strip-title">Fast Flow</span>
+                <p>Choose a workspace card and jump directly into the booking form.</p>
+            </article>
+        </section>
+
+        <section class="panel workspace-panel">
+            <div class="section-title">
+                <h3>Workspace List</h3>
+                <p>Each card shows current seat availability and hourly pricing.</p>
+            </div>
+            <div id="workspace-message" class="message hidden"></div>
+            <div id="workspace-grid" class="card-grid"></div>
+        </section>
+    </main>
+
+    <script src="/js/search.js"></script>
+</body>
+</html>

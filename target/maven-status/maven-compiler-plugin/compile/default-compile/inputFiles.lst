@@ -1,0 +1,12 @@
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/config/DatabaseInitializer.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/config/DatabaseManager.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/config/DatabaseProperties.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/controller/WorkspaceController.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/dao/WorkspaceDao.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/model/BookingRecord.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/model/BookingRequest.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/model/BookingResponse.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/model/UserRecord.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/model/Workspace.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/service/WorkspaceService.java
+/Users/shashankbhata/Pgrms/SQL_mini_project/src/main/java/com/coworking/web/CoworkingSpaceApplication.java
