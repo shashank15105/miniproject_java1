@@ -58,62 +58,120 @@ Before running this project, make sure you have the following installed:
 git clone https://github.com/shashank15105/miniproject_java1.git
 cd miniproject_java1
 ```
-🧭 HOW TO RUN THE PROJECT (2 TERMINALS SETUP)
+## ▶️ How to Run the Project
 
-👉 You need 2 terminals running simultaneously
+This project requires **two terminals**:
+one for the database (MySQL) and one for the backend (Spring Boot).
 
-🟢 TERMINAL 1 — DATABASE (MySQL)
-Step 1: Start MySQL
+---
+
+### 🟢 Terminal 1 — MySQL (Database)
+
+1. Start MySQL:
+
+```bash
 brew services start mysql
-Step 2: Open MySQL
-mysql -u root
-Step 3: Use database
-USE coworking_space;
-Step 4: Check data (optional)
-SHOW TABLES;
+```
 
+2. Open MySQL:
+
+```bash
+mysql -u root
+```
+
+3. Select the database:
+
+```sql
+USE coworking_space;
+```
+
+4. (Optional) Verify data:
+
+```sql
+SHOW TABLES;
 SELECT * FROM workspaces;
 SELECT * FROM bookings;
+```
 
-👉 Keep this terminal open to monitor DB
+---
 
-🟢 TERMINAL 2 — RUN BACKEND (Spring Boot)
-Step 1: Go to project
+### 🟢 Terminal 2 — Backend (Spring Boot)
+
+1. Navigate to project folder:
+
+```bash
 cd /Users/shashankbhata/Pgrms/SQL_mini_project
-Step 2: Run app
+```
+
+2. Run the application:
+
+```bash
 mvn spring-boot:run
+```
 
-👉 You’ll see logs like:
+3. Wait for:
 
+```text
 Tomcat started on port 8080
-🌐 STEP 3 — OPEN WEBSITE
+```
 
-Open browser:
+---
 
+### 🌐 Open in Browser
+
+```
 http://localhost:8080
-🔁 HOW BOTH TERMINALS WORK TOGETHER
+```
+
+---
+
+### 🔁 How It Works
+
+```
 Browser (UI)
    ↓
-Spring Boot (Terminal 2)
+Spring Boot Backend
    ↓
-MySQL (Terminal 1)
-🧪 LIVE TEST FLOW
-👉 1. Book a workspace (in browser)
-Enter name
-select workspace
-choose time
-click book
-👉 2. Check database (Terminal 1)
+MySQL Database
+```
+
+---
+
+### 🧪 Test the Application
+
+1. Open the website
+2. Enter your name and booking details
+3. Book a workspace
+
+Then check database:
+
+```sql
 SELECT * FROM bookings;
+```
 
-👉 You’ll see new booking row 🔥
+---
 
-⚠️ COMMON ISSUES
-❌ Port 8080 busy
+### ❗ Troubleshooting
+
+**Port 8080 already in use**
+
+```bash
 lsof -i :8080
 kill -9 <PID>
-❌ MySQL not running
+```
+
+**MySQL not running**
+
+```bash
 brew services start mysql
+```
+
+**Database not found**
+
+```sql
+CREATE DATABASE coworking_space;
+```
+
 
 ---
 
