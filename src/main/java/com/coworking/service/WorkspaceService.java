@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -113,6 +114,44 @@ public class WorkspaceService {
             throw ex;
         } catch (SQLException ex) {
             throw new RuntimeException("Unable to load bookings.", ex);
+        }
+    }
+
+    public int clearBookingsByUser(String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new IllegalArgumentException("User ID is required.");
+        }
+
+        try (Connection connection = databaseManager.getConnection()) {
+            connection.setAutoCommit(false);
+            try {
+                WorkspaceDao workspaceDao = new WorkspaceDao(connection);
+                String normalizedUserId = userId.trim();
+
+                if (!workspaceDao.userExists(normalizedUserId)) {
+                    throw new IllegalArgumentException("Invalid user ID.");
+                }
+
+                Map<String, Integer> bookingCounts = workspaceDao.fetchBookingCountsByUser(normalizedUserId);
+                int deletedCount = workspaceDao.deleteBookingsByUser(normalizedUserId);
+
+                for (Map.Entry<String, Integer> entry : bookingCounts.entrySet()) {
+                    workspaceDao.restoreSeats(entry.getKey(), entry.getValue());
+                }
+
+                connection.commit();
+                return deletedCount;
+            } catch (IllegalArgumentException | SQLException ex) {
+                connection.rollback();
+                if (ex instanceof IllegalArgumentException illegalArgumentException) {
+                    throw illegalArgumentException;
+                }
+                throw ex;
+            }
+        } catch (IllegalArgumentException ex) {
+            throw ex;
+        } catch (SQLException ex) {
+            throw new RuntimeException("Unable to clear booking history.", ex);
         }
     }
 

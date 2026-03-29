@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,6 +53,22 @@ public class WorkspaceController {
         try {
             List<BookingRecord> bookings = workspaceService.getBookingsByUser(userId);
             return ResponseEntity.ok(bookings);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", ex.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/bookings")
+    public ResponseEntity<?> clearBookings(@RequestParam String userId) {
+        try {
+            int deletedCount = workspaceService.clearBookingsByUser(userId);
+            String message = deletedCount > 0
+                ? "Booking history cleared successfully."
+                : "No booking history found for this user.";
+            return ResponseEntity.ok(Map.of("message", message, "deletedCount", deletedCount));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
         } catch (RuntimeException ex) {

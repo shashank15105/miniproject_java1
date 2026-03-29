@@ -10,7 +10,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WorkspaceDao {
     private final Connection connection;
@@ -173,6 +175,52 @@ public class WorkspaceDao {
         }
 
         return bookings;
+    }
+
+    public Map<String, Integer> fetchBookingCountsByUser(String userId) throws SQLException {
+        String sql =
+            "SELECT workspace_id, COUNT(*) AS booking_count " +
+            "FROM bookings " +
+            "WHERE user_id = ? " +
+            "GROUP BY workspace_id";
+
+        Map<String, Integer> bookingCounts = new LinkedHashMap<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, userId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    bookingCounts.put(
+                        resultSet.getString("workspace_id"),
+                        resultSet.getInt("booking_count")
+                    );
+                }
+            }
+        }
+
+        return bookingCounts;
+    }
+
+    public void restoreSeats(String workspaceId, int seatsToRestore) throws SQLException {
+        String sql =
+            "UPDATE workspaces " +
+            "SET available_seats = LEAST(capacity, available_seats + ?) " +
+            "WHERE workspace_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, seatsToRestore);
+            statement.setString(2, workspaceId);
+            statement.executeUpdate();
+        }
+    }
+
+    public int deleteBookingsByUser(String userId) throws SQLException {
+        String sql = "DELETE FROM bookings WHERE user_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, userId);
+            return statement.executeUpdate();
+        }
     }
 
     private Workspace mapWorkspace(ResultSet resultSet) throws SQLException {
