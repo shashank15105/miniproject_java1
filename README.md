@@ -58,58 +58,62 @@ Before running this project, make sure you have the following installed:
 git clone https://github.com/shashank15105/miniproject_java1.git
 cd miniproject_java1
 ```
+🧭 HOW TO RUN THE PROJECT (2 TERMINALS SETUP)
 
----
+👉 You need 2 terminals running simultaneously
 
-### 2. Start MySQL
-
-Make sure MySQL server is running.
-
-```bash
+🟢 TERMINAL 1 — DATABASE (MySQL)
+Step 1: Start MySQL
 brew services start mysql
-```
-
----
-
-### 3. Create Database
-
-Open MySQL:
-
-```bash
+Step 2: Open MySQL
 mysql -u root
-```
+Step 3: Use database
+USE coworking_space;
+Step 4: Check data (optional)
+SHOW TABLES;
 
-Run:
+SELECT * FROM workspaces;
+SELECT * FROM bookings;
 
-```sql
-CREATE DATABASE coworking_space;
-```
+👉 Keep this terminal open to monitor DB
 
----
-
-### 4. Configure Database Connection
-
-Open:
-
-```text
-src/main/resources/application.properties
-```
-
----
-
-### 5. Run the Application
-
-```bash
+🟢 TERMINAL 2 — RUN BACKEND (Spring Boot)
+Step 1: Go to project
+cd /Users/shashankbhata/Pgrms/SQL_mini_project
+Step 2: Run app
 mvn spring-boot:run
-```
 
----
+👉 You’ll see logs like:
 
-### 6. Open in Browser
+Tomcat started on port 8080
+🌐 STEP 3 — OPEN WEBSITE
 
-```
+Open browser:
+
 http://localhost:8080
-```
+🔁 HOW BOTH TERMINALS WORK TOGETHER
+Browser (UI)
+   ↓
+Spring Boot (Terminal 2)
+   ↓
+MySQL (Terminal 1)
+🧪 LIVE TEST FLOW
+👉 1. Book a workspace (in browser)
+Enter name
+select workspace
+choose time
+click book
+👉 2. Check database (Terminal 1)
+SELECT * FROM bookings;
+
+👉 You’ll see new booking row 🔥
+
+⚠️ COMMON ISSUES
+❌ Port 8080 busy
+lsof -i :8080
+kill -9 <PID>
+❌ MySQL not running
+brew services start mysql
 
 ---
 
