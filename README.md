@@ -95,14 +95,6 @@ Open:
 src/main/resources/application.properties
 ```
 
-Update if needed:
-
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/coworking_space
-spring.datasource.username=root
-spring.datasource.password=YOUR_PASSWORD
-```
-
 ---
 
 ### 5. Run the Application
