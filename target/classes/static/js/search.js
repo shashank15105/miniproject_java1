@@ -1,8 +1,17 @@
 const workspaceGrid = document.getElementById("workspace-grid");
 const workspaceMessage = document.getElementById("workspace-message");
 const refreshButton = document.getElementById("refresh-workspaces");
+const cityFilter = document.getElementById("city-filter");
+const clearCityFilterButton = document.getElementById("clear-city-filter");
+
+let allWorkspaces = [];
 
 refreshButton.addEventListener("click", loadWorkspaces);
+cityFilter.addEventListener("change", applyFilters);
+clearCityFilterButton.addEventListener("click", () => {
+    cityFilter.value = "ALL";
+    applyFilters();
+});
 loadWorkspaces();
 
 async function loadWorkspaces() {
@@ -16,7 +25,9 @@ async function loadWorkspaces() {
             throw new Error(data.message || "Unable to load workspaces.");
         }
 
-        renderWorkspaces(data);
+        allWorkspaces = data;
+        populateCityFilter(data);
+        applyFilters();
         showMessage(
             workspaceMessage,
             data.length ? `Loaded ${data.length} workspace(s).` : "No workspaces with available seats right now.",
@@ -26,6 +37,38 @@ async function loadWorkspaces() {
         workspaceGrid.innerHTML = `<div class="empty-state">${error.message}</div>`;
         showMessage(workspaceMessage, error.message, "error");
     }
+}
+
+function populateCityFilter(workspaces) {
+    const cities = [...new Set(workspaces.map((workspace) => workspace.location))].sort((left, right) =>
+        left.localeCompare(right)
+    );
+
+    const currentValue = cityFilter.value || "ALL";
+    cityFilter.innerHTML = `
+        <option value="ALL">All Cities</option>
+        ${cities.map((city) => `<option value="${city}">${city}</option>`).join("")}
+    `;
+
+    if (cities.includes(currentValue)) {
+        cityFilter.value = currentValue;
+    }
+}
+
+function applyFilters() {
+    const selectedCity = cityFilter.value;
+    const filteredWorkspaces = selectedCity === "ALL"
+        ? allWorkspaces
+        : allWorkspaces.filter((workspace) => workspace.location === selectedCity);
+
+    renderWorkspaces(filteredWorkspaces);
+    showMessage(
+        workspaceMessage,
+        filteredWorkspaces.length
+            ? `Showing ${filteredWorkspaces.length} workspace(s)${selectedCity === "ALL" ? "" : ` in ${selectedCity}`}.`
+            : `No workspaces available in ${selectedCity}.`,
+        filteredWorkspaces.length ? "success" : "error"
+    );
 }
 
 function renderWorkspaces(workspaces) {
@@ -40,13 +83,18 @@ function renderWorkspaces(workspaces) {
                 <span class="card-badge">${workspace.workspaceId}</span>
                 <span class="price-tag">Rs ${workspace.pricePerHour}/hr</span>
             </div>
-            <h3>${workspace.name}</h3>
+            <div class="workspace-heading">
+                <h3>${workspace.name}</h3>
+                <span class="seat-pill ${workspace.availableSeats <= 3 ? "seat-pill-low" : "seat-pill-open"}">
+                    ${workspace.availableSeats <= 3 ? `Only ${workspace.availableSeats} left` : `${workspace.availableSeats} seats left`}
+                </span>
+            </div>
             <p class="workspace-location">${workspace.location}</p>
             <div class="workspace-meta">
                 <span>Capacity: ${workspace.capacity}</span>
-                <span>Available: ${workspace.availableSeats}</span>
+                <span>Live availability: ${workspace.availableSeats}</span>
             </div>
-            <a class="primary-button card-button" href="/book.html?workspaceId=${encodeURIComponent(workspace.workspaceId)}">Book</a>
+            <a class="primary-button card-button" href="/book.html?workspaceId=${encodeURIComponent(workspace.workspaceId)}">Book Now</a>
         </article>
     `).join("");
 }

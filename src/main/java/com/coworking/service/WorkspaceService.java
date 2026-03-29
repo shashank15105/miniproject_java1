@@ -2,6 +2,7 @@ package com.coworking.service;
 
 import com.coworking.config.DatabaseManager;
 import com.coworking.dao.WorkspaceDao;
+import com.coworking.model.BookingDetails;
 import com.coworking.model.BookingRecord;
 import com.coworking.model.BookingRequest;
 import com.coworking.model.BookingResponse;
@@ -19,9 +20,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkspaceService {
     private final DatabaseManager databaseManager;
+    private final BookingNotificationService bookingNotificationService;
+    private final ReceiptService receiptService;
 
-    public WorkspaceService(DatabaseManager databaseManager) {
+    public WorkspaceService(
+        DatabaseManager databaseManager,
+        BookingNotificationService bookingNotificationService,
+        ReceiptService receiptService
+    ) {
         this.databaseManager = databaseManager;
+        this.bookingNotificationService = bookingNotificationService;
+        this.receiptService = receiptService;
     }
 
     public List<Workspace> getAvailableWorkspaces() {
@@ -33,15 +42,18 @@ public class WorkspaceService {
         }
     }
 
-    public BookingResponse bookWorkspace(BookingRequest request) {
-        validateBookingRequest(request);
+    public BookingResponse bookWorkspace(BookingRequest request, UserRecord authenticatedUser) {
+        validateBookingRequest(request, authenticatedUser);
+        BookingDetails bookingDetails;
 
         try (Connection connection = databaseManager.getConnection()) {
             connection.setAutoCommit(false);
             try {
                 WorkspaceDao workspaceDao = new WorkspaceDao(connection);
 
-                UserRecord user = resolveOrCreateUser(workspaceDao, request);
+                UserRecord user = authenticatedUser != null
+                    ? authenticatedUser
+                    : resolveOrCreateUser(workspaceDao, request);
 
                 Workspace workspace = workspaceDao.findWorkspace(request.getWorkspaceId().trim());
                 if (workspace == null) {
@@ -73,15 +85,8 @@ public class WorkspaceService {
                     totalPrice
                 );
 
+                bookingDetails = workspaceDao.fetchBookingDetails(bookingId);
                 connection.commit();
-                return new BookingResponse(
-                    true,
-                    "Workspace booked successfully.",
-                    bookingId,
-                    totalPrice,
-                    user.getUserId(),
-                    user.getName()
-                );
             } catch (IllegalArgumentException | IllegalStateException | SQLException ex) {
                 connection.rollback();
                 if (ex instanceof IllegalArgumentException illegalArgumentException) {
@@ -97,19 +102,30 @@ public class WorkspaceService {
         } catch (SQLException ex) {
             throw new RuntimeException("Unable to complete booking.", ex);
         }
+
+        boolean emailSent = bookingNotificationService.sendConfirmationEmail(bookingDetails);
+        return new BookingResponse(
+            true,
+            emailSent ? "Workspace booked and confirmation email sent." : "Workspace booked successfully.",
+            bookingDetails.getBookingId(),
+            bookingDetails.getTotalPrice(),
+            bookingDetails.getUserId(),
+            bookingDetails.getUserName(),
+            emailSent,
+            "/bookings/" + bookingDetails.getBookingId() + "/receipt",
+            "/bookings/" + bookingDetails.getBookingId() + "/email-preview"
+        );
     }
 
-    public List<BookingRecord> getBookingsByUser(String userId) {
-        if (userId == null || userId.trim().isEmpty()) {
-            throw new IllegalArgumentException("User ID is required.");
-        }
+    public List<BookingRecord> getBookingsByUser(String userId, UserRecord authenticatedUser) {
+        String targetUserId = resolveTargetUserId(userId, authenticatedUser);
 
         try (Connection connection = databaseManager.getConnection()) {
             WorkspaceDao workspaceDao = new WorkspaceDao(connection);
-            if (!workspaceDao.userExists(userId.trim())) {
+            if (!workspaceDao.userExists(targetUserId)) {
                 throw new IllegalArgumentException("Invalid user ID.");
             }
-            return workspaceDao.fetchBookingsByUser(userId.trim());
+            return workspaceDao.fetchBookingsByUser(targetUserId);
         } catch (IllegalArgumentException ex) {
             throw ex;
         } catch (SQLException ex) {
@@ -117,23 +133,20 @@ public class WorkspaceService {
         }
     }
 
-    public int clearBookingsByUser(String userId) {
-        if (userId == null || userId.trim().isEmpty()) {
-            throw new IllegalArgumentException("User ID is required.");
-        }
+    public int clearBookingsByUser(String userId, UserRecord authenticatedUser) {
+        String targetUserId = resolveTargetUserId(userId, authenticatedUser);
 
         try (Connection connection = databaseManager.getConnection()) {
             connection.setAutoCommit(false);
             try {
                 WorkspaceDao workspaceDao = new WorkspaceDao(connection);
-                String normalizedUserId = userId.trim();
 
-                if (!workspaceDao.userExists(normalizedUserId)) {
+                if (!workspaceDao.userExists(targetUserId)) {
                     throw new IllegalArgumentException("Invalid user ID.");
                 }
 
-                Map<String, Integer> bookingCounts = workspaceDao.fetchBookingCountsByUser(normalizedUserId);
-                int deletedCount = workspaceDao.deleteBookingsByUser(normalizedUserId);
+                Map<String, Integer> bookingCounts = workspaceDao.fetchBookingCountsByUser(targetUserId);
+                int deletedCount = workspaceDao.deleteBookingsByUser(targetUserId);
 
                 for (Map.Entry<String, Integer> entry : bookingCounts.entrySet()) {
                     workspaceDao.restoreSeats(entry.getKey(), entry.getValue());
@@ -155,11 +168,21 @@ public class WorkspaceService {
         }
     }
 
-    private void validateBookingRequest(BookingRequest request) {
+    public byte[] generateReceipt(String bookingId, UserRecord authenticatedUser) {
+        BookingDetails bookingDetails = getAuthorizedBooking(bookingId, authenticatedUser);
+        return receiptService.generateReceipt(bookingDetails);
+    }
+
+    public String generateEmailPreview(String bookingId, UserRecord authenticatedUser) {
+        BookingDetails bookingDetails = getAuthorizedBooking(bookingId, authenticatedUser);
+        return bookingNotificationService.buildEmailPreview(bookingDetails);
+    }
+
+    private void validateBookingRequest(BookingRequest request, UserRecord authenticatedUser) {
         if (request == null) {
             throw new IllegalArgumentException("Request body is required.");
         }
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
+        if (authenticatedUser == null && (request.getName() == null || request.getName().trim().isEmpty())) {
             throw new IllegalArgumentException("Name is required.");
         }
         if (request.getEmail() != null && !request.getEmail().isBlank() && !isValidEmail(request.getEmail())) {
@@ -191,6 +214,38 @@ public class WorkspaceService {
         }
 
         return workspaceDao.createUser(generateUserId(), normalizedName, normalizedEmail);
+    }
+
+    private BookingDetails getAuthorizedBooking(String bookingId, UserRecord authenticatedUser) {
+        if (bookingId == null || bookingId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Booking ID is required.");
+        }
+
+        try (Connection connection = databaseManager.getConnection()) {
+            WorkspaceDao workspaceDao = new WorkspaceDao(connection);
+            BookingDetails bookingDetails = workspaceDao.fetchBookingDetails(bookingId.trim());
+            if (bookingDetails == null) {
+                throw new IllegalArgumentException("Booking not found.");
+            }
+            if (authenticatedUser != null && !bookingDetails.getUserId().equals(authenticatedUser.getUserId())) {
+                throw new IllegalArgumentException("You can only access your own bookings.");
+            }
+            return bookingDetails;
+        } catch (IllegalArgumentException ex) {
+            throw ex;
+        } catch (SQLException ex) {
+            throw new RuntimeException("Unable to load booking details.", ex);
+        }
+    }
+
+    private String resolveTargetUserId(String requestedUserId, UserRecord authenticatedUser) {
+        if (authenticatedUser != null) {
+            return authenticatedUser.getUserId();
+        }
+        if (requestedUserId == null || requestedUserId.trim().isEmpty()) {
+            throw new IllegalArgumentException("User ID is required.");
+        }
+        return requestedUserId.trim();
     }
 
     private int calculateTotalPrice(LocalDateTime startTime, LocalDateTime endTime, int pricePerHour) {

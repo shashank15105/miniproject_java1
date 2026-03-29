@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Co-Working Space | Book Workspace</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css?v=4">
 </head>
 <body>
     <header class="site-header">
@@ -15,11 +15,14 @@
                 <p>Reserve a workspace by user, time slot, and location.</p>
             </div>
         </div>
-        <nav class="navbar">
-            <a href="/index.html">Workspaces</a>
-            <a class="active" href="/book.html">Book</a>
-            <a href="/bookings.html">My Bookings</a>
-        </nav>
+        <div class="header-actions">
+            <nav class="navbar">
+                <a href="/index.html">Workspaces</a>
+                <a class="active" href="/book.html">Book</a>
+                <a href="/bookings.html">My Bookings</a>
+            </nav>
+            <div id="auth-controls" class="auth-controls"></div>
+        </div>
     </header>
 
     <main class="page-shell">
@@ -41,15 +44,11 @@
                 </div>
                 <form id="booking-form" class="booking-form-grid">
                     <div class="form-section">
-                        <div class="section-kicker">User</div>
-                        <label>
-                            Full Name
-                            <input type="text" id="name" placeholder="Enter your name" required>
-                        </label>
-                        <label>
-                            Email Address
-                            <input type="email" id="email" placeholder="Optional email for faster lookup">
-                        </label>
+                        <div class="section-kicker">Account</div>
+                        <div id="booking-account-card" class="account-card">
+                            <h4>Sign in to book this workspace</h4>
+                            <p>Use the login or signup controls in the header. Once you are signed in, bookings and receipts will stay linked to your account automatically.</p>
+                        </div>
                     </div>
 
                     <div class="form-section">
@@ -105,9 +104,9 @@
                 <span class="eyebrow">Booking Tips</span>
                 <h3>Better booking flow</h3>
                 <ul class="info-list">
-                    <li>Enter your name and optional email. The system will find or create your user automatically.</li>
-                    <li>Workspaces load automatically from the live API and show remaining seats.</li>
-                    <li>The confirm button stays disabled until the time slot is valid.</li>
+                    <li>Sign in once and every booking, receipt, and history lookup will stay connected to your account.</li>
+                    <li>Workspaces load automatically from the live API and show remaining seats in real time.</li>
+                    <li>The confirm button stays disabled until you are signed in and the time slot is valid.</li>
                 </ul>
 
                 <div class="assist-card">
@@ -118,6 +117,46 @@
         </section>
     </main>
 
-    <script src="/js/book.js"></script>
+    <div id="auth-modal" class="auth-modal hidden" aria-hidden="true">
+        <div class="auth-backdrop" data-auth-close></div>
+        <section class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+            <button type="button" class="auth-close" data-auth-close aria-label="Close authentication panel">&times;</button>
+            <span class="eyebrow">Member Access</span>
+            <h2 id="auth-title">Sign in before you reserve</h2>
+            <p class="auth-intro">A signed-in account keeps your reservations, receipts, and booking history connected to you automatically.</p>
+            <div class="auth-switcher">
+                <button type="button" class="auth-tab active" data-auth-tab="login">Log In</button>
+                <button type="button" class="auth-tab" data-auth-tab="signup">Sign Up</button>
+            </div>
+            <div id="auth-message" class="message hidden"></div>
+            <form id="login-form" class="auth-form">
+                <label>
+                    Email Address
+                    <input type="email" id="login-email" placeholder="Enter your registered email" required>
+                </label>
+                <button type="submit" class="primary-button">Log In</button>
+            </form>
+            <form id="signup-form" class="auth-form hidden">
+                <div class="auth-grid">
+                    <label>
+                        Full Name
+                        <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                    </label>
+                    <label>
+                        Phone
+                        <input type="text" id="signup-phone" placeholder="Optional phone number">
+                    </label>
+                </div>
+                <label>
+                    Email Address
+                    <input type="email" id="signup-email" placeholder="Enter your email" required>
+                </label>
+                <button type="submit" class="primary-button">Create Account</button>
+            </form>
+        </section>
+    </div>
+
+    <script src="/js/app.js?v=4"></script>
+    <script src="/js/book.js?v=4"></script>
 </body>
 </html>

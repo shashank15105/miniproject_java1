@@ -1,5 +1,6 @@
 package com.coworking.dao;
 
+import com.coworking.model.BookingDetails;
 import com.coworking.model.BookingRecord;
 import com.coworking.model.UserRecord;
 import com.coworking.model.Workspace;
@@ -51,9 +52,39 @@ public class WorkspaceDao {
         }
     }
 
+    public UserRecord findUserById(String userId) throws SQLException {
+        String sql = "SELECT user_id, name, email, phone FROM users WHERE user_id = ? LIMIT 1";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, userId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapUser(resultSet);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public UserRecord findUserByEmail(String email) throws SQLException {
+        String sql = "SELECT user_id, name, email, phone FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email.trim());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapUser(resultSet);
+                }
+            }
+        }
+
+        return null;
+    }
+
     public UserRecord findUserByNameOrEmail(String name, String email) throws SQLException {
         if (email != null && !email.isBlank()) {
-            String sql = "SELECT user_id, name, email FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1";
+            String sql = "SELECT user_id, name, email, phone FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, email.trim());
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -64,7 +95,7 @@ public class WorkspaceDao {
             }
         }
 
-        String sql = "SELECT user_id, name, email FROM users WHERE LOWER(name) = LOWER(?) ORDER BY user_id LIMIT 1";
+        String sql = "SELECT user_id, name, email, phone FROM users WHERE LOWER(name) = LOWER(?) ORDER BY user_id LIMIT 1";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, name.trim());
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -78,17 +109,21 @@ public class WorkspaceDao {
     }
 
     public UserRecord createUser(String userId, String name, String email) throws SQLException {
+        return createUser(userId, name, email, "NA");
+    }
+
+    public UserRecord createUser(String userId, String name, String email, String phone) throws SQLException {
         String sql = "INSERT INTO users (user_id, name, email, phone) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, userId);
             statement.setString(2, name.trim());
             statement.setString(3, normalizedEmail(email));
-            statement.setString(4, "NA");
+            statement.setString(4, normalizedPhone(phone));
             statement.executeUpdate();
         }
 
-        return new UserRecord(userId, name.trim(), normalizedEmail(email));
+        return new UserRecord(userId, name.trim(), normalizedEmail(email), normalizedPhone(phone));
     }
 
     public Workspace findWorkspace(String workspaceId) throws SQLException {
@@ -223,6 +258,40 @@ public class WorkspaceDao {
         }
     }
 
+    public BookingDetails fetchBookingDetails(String bookingId) throws SQLException {
+        String sql =
+            "SELECT b.booking_id, b.user_id, u.name AS user_name, u.email AS user_email, u.phone AS user_phone, " +
+            "b.workspace_id, w.name AS workspace_name, w.location, b.start_time, b.end_time, b.total_price " +
+            "FROM bookings b " +
+            "JOIN users u ON b.user_id = u.user_id " +
+            "JOIN workspaces w ON b.workspace_id = w.workspace_id " +
+            "WHERE b.booking_id = ? " +
+            "LIMIT 1";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, bookingId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new BookingDetails(
+                        resultSet.getString("booking_id"),
+                        resultSet.getString("user_id"),
+                        resultSet.getString("user_name"),
+                        resultSet.getString("user_email"),
+                        resultSet.getString("user_phone"),
+                        resultSet.getString("workspace_id"),
+                        resultSet.getString("workspace_name"),
+                        resultSet.getString("location"),
+                        resultSet.getTimestamp("start_time").toLocalDateTime(),
+                        resultSet.getTimestamp("end_time").toLocalDateTime(),
+                        resultSet.getInt("total_price")
+                    );
+                }
+            }
+        }
+
+        return null;
+    }
+
     private Workspace mapWorkspace(ResultSet resultSet) throws SQLException {
         return new Workspace(
             resultSet.getString("workspace_id"),
@@ -238,11 +307,16 @@ public class WorkspaceDao {
         return new UserRecord(
             resultSet.getString("user_id"),
             resultSet.getString("name"),
-            resultSet.getString("email")
+            resultSet.getString("email"),
+            resultSet.getString("phone")
         );
     }
 
     private String normalizedEmail(String email) {
         return email == null || email.isBlank() ? "NA" : email.trim();
+    }
+
+    private String normalizedPhone(String phone) {
+        return phone == null || phone.isBlank() ? "NA" : phone.trim();
     }
 }

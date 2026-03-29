@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Co-Working Space | Explore Workspaces</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css?v=4">
 </head>
 <body>
     <header class="site-header">
@@ -15,11 +15,14 @@
                 <p>Browse workspaces, reserve seats, and manage your bookings.</p>
             </div>
         </div>
-        <nav class="navbar">
-            <a class="active" href="/index.html">Workspaces</a>
-            <a href="/book.html">Book</a>
-            <a href="/bookings.html">My Bookings</a>
-        </nav>
+        <div class="header-actions">
+            <nav class="navbar">
+                <a class="active" href="/index.html">Workspaces</a>
+                <a href="/book.html">Book</a>
+                <a href="/bookings.html">My Bookings</a>
+            </nav>
+            <div id="auth-controls" class="auth-controls"></div>
+        </div>
     </header>
 
     <main class="page-shell">
@@ -54,15 +57,15 @@
         <section class="strip-grid">
             <article class="strip-card">
                 <span class="strip-title">Hot Cities</span>
-                <p>Mumbai and Bengaluru are seeded and ready for demo bookings.</p>
+                <p>Mumbai, Bengaluru, Pune, Hyderabad, Chennai, Delhi, Gurugram, Kolkata, Noida, and Goa are ready to book.</p>
             </article>
             <article class="strip-card">
                 <span class="strip-title">Pricing Model</span>
                 <p>Hourly rates are shown upfront so users can estimate cost before booking.</p>
             </article>
             <article class="strip-card">
-                <span class="strip-title">Fast Flow</span>
-                <p>Choose a workspace card and jump directly into the booking form.</p>
+                <span class="strip-title">Member Access</span>
+                <p>Log in once and the booking page will automatically reserve seats under your account.</p>
             </article>
         </section>
 
@@ -71,11 +74,60 @@
                 <h3>Workspace List</h3>
                 <p>Each card shows current seat availability and hourly pricing.</p>
             </div>
+            <div class="filter-bar">
+                <label class="filter-field">
+                    City
+                    <select id="city-filter">
+                        <option value="ALL">All Cities</option>
+                    </select>
+                </label>
+                <button id="clear-city-filter" type="button" class="secondary-button compact-button">Clear Filter</button>
+            </div>
             <div id="workspace-message" class="message hidden"></div>
             <div id="workspace-grid" class="card-grid"></div>
         </section>
     </main>
 
-    <script src="/js/search.js"></script>
+    <div id="auth-modal" class="auth-modal hidden" aria-hidden="true">
+        <div class="auth-backdrop" data-auth-close></div>
+        <section class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+            <button type="button" class="auth-close" data-auth-close aria-label="Close authentication panel">&times;</button>
+            <span class="eyebrow">Member Access</span>
+            <h2 id="auth-title">Sign in to manage your bookings</h2>
+            <p class="auth-intro">Create an account with your email once, then the booking and history pages will stay linked to you automatically.</p>
+            <div class="auth-switcher">
+                <button type="button" class="auth-tab active" data-auth-tab="login">Log In</button>
+                <button type="button" class="auth-tab" data-auth-tab="signup">Sign Up</button>
+            </div>
+            <div id="auth-message" class="message hidden"></div>
+            <form id="login-form" class="auth-form">
+                <label>
+                    Email Address
+                    <input type="email" id="login-email" placeholder="Enter your registered email" required>
+                </label>
+                <button type="submit" class="primary-button">Log In</button>
+            </form>
+            <form id="signup-form" class="auth-form hidden">
+                <div class="auth-grid">
+                    <label>
+                        Full Name
+                        <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                    </label>
+                    <label>
+                        Phone
+                        <input type="text" id="signup-phone" placeholder="Optional phone number">
+                    </label>
+                </div>
+                <label>
+                    Email Address
+                    <input type="email" id="signup-email" placeholder="Enter your email" required>
+                </label>
+                <button type="submit" class="primary-button">Create Account</button>
+            </form>
+        </section>
+    </div>
+
+    <script src="/js/app.js?v=4"></script>
+    <script src="/js/search.js?v=4"></script>
 </body>
 </html>
