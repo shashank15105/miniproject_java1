@@ -50,3 +50,31 @@ CREATE TABLE IF NOT EXISTS workspace_reviews (
     CHECK (rating >= 1),
     CHECK (rating <= 5)
 );
+
+DROP TRIGGER IF EXISTS before_insert_workspace_review;
+
+CREATE TRIGGER before_insert_workspace_review
+BEFORE INSERT ON workspace_reviews
+FOR EACH ROW
+SET NEW.reviewed_on = COALESCE(NEW.reviewed_on, CURRENT_TIMESTAMP);
+
+DROP PROCEDURE IF EXISTS GetUserBookingHistory;
+
+CREATE PROCEDURE GetUserBookingHistory(IN p_user_id VARCHAR(50))
+SELECT
+    b.booking_id,
+    u.user_id,
+    u.name,
+    u.email,
+    u.phone,
+    w.workspace_id,
+    w.name AS workspace_name,
+    w.location,
+    b.start_time,
+    b.end_time,
+    b.total_price
+FROM bookings b
+JOIN users u ON b.user_id = u.user_id
+JOIN workspaces w ON b.workspace_id = w.workspace_id
+WHERE b.user_id = p_user_id
+ORDER BY b.start_time DESC;

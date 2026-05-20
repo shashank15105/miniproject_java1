@@ -182,11 +182,30 @@ function handleWorkspaceChange() {
     const workspace = getSelectedWorkspace();
 
     if (!workspace) {
-        workspaceDetails.innerHTML = `<div class="workspace-selection-empty">Choose a workspace to see price, location, and remaining seats.</div>`;
+        workspaceDetails.innerHTML = `<div class="workspace-selection-empty">Choose a workspace to see price, location, remaining seats, amenities, and reviews.</div>`;
         assistMessage.textContent = "Select a workspace to start your booking.";
         updatePreview();
         return;
     }
+
+    const amenities = workspace.amenities && workspace.amenities.length
+        ? workspace.amenities
+        : ["Workspace ready"];
+    const reviewSummary = workspace.reviewCount > 0
+        ? `
+            <div class="workspace-review-row">
+                <span class="review-pill">${formatRating(workspace.averageRating)} ★</span>
+                <span class="review-meta">${workspace.reviewCount} review${workspace.reviewCount === 1 ? "" : "s"}</span>
+            </div>
+            <p class="workspace-selection-note">Members have already rated this workspace for comfort, setup, and overall experience.</p>
+        `
+        : `
+            <div class="workspace-review-row">
+                <span class="review-pill">New workspace</span>
+                <span class="review-meta">No reviews yet</span>
+            </div>
+            <p class="workspace-selection-note">Be one of the first members to book this workspace and leave a review.</p>
+        `;
 
     workspaceDetails.innerHTML = `
         <div class="workspace-selection-top">
@@ -198,6 +217,18 @@ function handleWorkspaceChange() {
         <div class="workspace-selection-meta">
             <span>Capacity: ${workspace.capacity}</span>
             <span>Remaining Seats: ${workspace.availableSeats}</span>
+        </div>
+        <div class="workspace-detail-section">
+            <span class="workspace-detail-label">Workspace Amenities</span>
+            <div class="amenity-list">
+                ${amenities.map((amenity) => `
+                    <span class="amenity-chip">${escapeHtml(amenity)}</span>
+                `).join("")}
+            </div>
+        </div>
+        <div class="workspace-detail-section">
+            <span class="workspace-detail-label">Workspace Reviews</span>
+            ${reviewSummary}
         </div>
     `;
     assistMessage.textContent = workspace.availableSeats > 0
@@ -286,6 +317,10 @@ function formatHours(hours) {
         return "-";
     }
     return hours % 1 === 0 ? `${hours} hour${hours === 1 ? "" : "s"}` : `${hours.toFixed(1)} hours`;
+}
+
+function formatRating(value) {
+    return Number(value).toFixed(1);
 }
 
 function showValidation(message) {
