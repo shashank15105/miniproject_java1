@@ -3,6 +3,7 @@ com/coworking/controller/WorkspaceController.class
 com/coworking/model/AuthResponse.class
 com/coworking/config/DatabaseProperties.class
 com/coworking/model/BookingRecord.class
+com/coworking/dao/WorkspaceDao$ReviewSummary.class
 com/coworking/controller/AuthController.class
 com/coworking/web/CoworkingSpaceApplication.class
 com/coworking/model/UserRecord.class

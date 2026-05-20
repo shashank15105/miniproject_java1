@@ -598,6 +598,31 @@ select {
     font-size: 1rem;
 }
 
+.workspace-review-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.review-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(237, 245, 253, 0.92);
+    color: var(--cool);
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.review-meta {
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
 .seat-pill {
     display: inline-flex;
     align-items: center;
@@ -632,6 +657,25 @@ select {
     border-radius: 16px;
     background: rgba(255, 255, 255, 0.7);
     border: 1px solid rgba(104, 122, 153, 0.12);
+}
+
+.amenity-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.amenity-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 12px;
+    border-radius: 999px;
+    background: rgba(255, 242, 234, 0.92);
+    color: var(--accent-deep);
+    font-size: 0.84rem;
+    font-weight: 700;
+    border: 1px solid rgba(201, 109, 59, 0.12);
 }
 
 .card-button {

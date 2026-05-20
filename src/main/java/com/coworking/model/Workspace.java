@@ -1,5 +1,7 @@
 package com.coworking.model;
 
+import java.util.List;
+
 public class Workspace {
     private final String workspaceId;
     private final String name;
@@ -7,6 +9,9 @@ public class Workspace {
     private final int capacity;
     private final int availableSeats;
     private final int pricePerHour;
+    private final List<String> amenities;
+    private final double averageRating;
+    private final int reviewCount;
 
     public Workspace(
         String workspaceId,
@@ -14,7 +19,10 @@ public class Workspace {
         String location,
         int capacity,
         int availableSeats,
-        int pricePerHour
+        int pricePerHour,
+        List<String> amenities,
+        double averageRating,
+        int reviewCount
     ) {
         this.workspaceId = workspaceId;
         this.name = name;
@@ -22,6 +30,9 @@ public class Workspace {
         this.capacity = capacity;
         this.availableSeats = availableSeats;
         this.pricePerHour = pricePerHour;
+        this.amenities = amenities;
+        this.averageRating = averageRating;
+        this.reviewCount = reviewCount;
     }
 
     public String getWorkspaceId() {
@@ -46,5 +57,17 @@ public class Workspace {
 
     public int getPricePerHour() {
         return pricePerHour;
+    }
+
+    public List<String> getAmenities() {
+        return amenities;
+    }
+
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public int getReviewCount() {
+        return reviewCount;
     }
 }

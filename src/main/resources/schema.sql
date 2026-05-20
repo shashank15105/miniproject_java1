@@ -30,3 +30,23 @@ CREATE TABLE IF NOT EXISTS bookings (
     CHECK (end_time > start_time),
     CHECK (total_price >= 0)
 );
+
+CREATE TABLE IF NOT EXISTS workspace_amenities (
+    amenity_id VARCHAR(50) PRIMARY KEY,
+    workspace_id VARCHAR(50) NOT NULL,
+    amenity_name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (workspace_id) REFERENCES workspaces(workspace_id)
+);
+
+CREATE TABLE IF NOT EXISTS workspace_reviews (
+    review_id VARCHAR(50) PRIMARY KEY,
+    workspace_id VARCHAR(50) NOT NULL,
+    user_id VARCHAR(50) NOT NULL,
+    rating INT NOT NULL,
+    review_text VARCHAR(255) NOT NULL,
+    reviewed_on DATETIME NOT NULL,
+    FOREIGN KEY (workspace_id) REFERENCES workspaces(workspace_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CHECK (rating >= 1),
+    CHECK (rating <= 5)
+);

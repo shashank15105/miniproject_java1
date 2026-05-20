@@ -34,7 +34,7 @@ public class WorkspaceDao {
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                workspaces.add(mapWorkspace(resultSet));
+                workspaces.add(enrichWorkspace(mapWorkspace(resultSet)));
             }
         }
 
@@ -135,7 +135,7 @@ public class WorkspaceDao {
             statement.setString(1, workspaceId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return mapWorkspace(resultSet);
+                    return enrichWorkspace(mapWorkspace(resultSet));
                 }
             }
         }
@@ -299,8 +299,70 @@ public class WorkspaceDao {
             resultSet.getString("location"),
             resultSet.getInt("capacity"),
             resultSet.getInt("available_seats"),
-            resultSet.getInt("price_per_hour")
+            resultSet.getInt("price_per_hour"),
+            List.of(),
+            0.0,
+            0
         );
+    }
+
+    private Workspace enrichWorkspace(Workspace workspace) throws SQLException {
+        List<String> amenities = fetchAmenitiesByWorkspace(workspace.getWorkspaceId());
+        ReviewSummary reviewSummary = fetchReviewSummaryByWorkspace(workspace.getWorkspaceId());
+
+        return new Workspace(
+            workspace.getWorkspaceId(),
+            workspace.getName(),
+            workspace.getLocation(),
+            workspace.getCapacity(),
+            workspace.getAvailableSeats(),
+            workspace.getPricePerHour(),
+            amenities,
+            reviewSummary.averageRating(),
+            reviewSummary.reviewCount()
+        );
+    }
+
+    private List<String> fetchAmenitiesByWorkspace(String workspaceId) throws SQLException {
+        String sql =
+            "SELECT amenity_name " +
+            "FROM workspace_amenities " +
+            "WHERE workspace_id = ? " +
+            "ORDER BY amenity_name";
+
+        List<String> amenities = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, workspaceId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    amenities.add(resultSet.getString("amenity_name"));
+                }
+            }
+        }
+
+        return amenities;
+    }
+
+    private ReviewSummary fetchReviewSummaryByWorkspace(String workspaceId) throws SQLException {
+        String sql =
+            "SELECT COALESCE(AVG(rating), 0) AS average_rating, COUNT(*) AS review_count " +
+            "FROM workspace_reviews " +
+            "WHERE workspace_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, workspaceId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new ReviewSummary(
+                        resultSet.getDouble("average_rating"),
+                        resultSet.getInt("review_count")
+                    );
+                }
+            }
+        }
+
+        return new ReviewSummary(0.0, 0);
     }
 
     private UserRecord mapUser(ResultSet resultSet) throws SQLException {
@@ -319,4 +381,6 @@ public class WorkspaceDao {
     private String normalizedPhone(String phone) {
         return phone == null || phone.isBlank() ? "NA" : phone.trim();
     }
+
+    private record ReviewSummary(double averageRating, int reviewCount) { }
 }

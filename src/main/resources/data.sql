@@ -277,3 +277,53 @@ location = VALUES(location),
 capacity = VALUES(capacity),
 price_per_hour = VALUES(price_per_hour),
 available_seats = LEAST(VALUES(capacity), GREATEST(available_seats, 0));
+
+INSERT INTO workspace_amenities (amenity_id, workspace_id, amenity_name)
+SELECT 'A1', 'W1', 'High-Speed WiFi'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM workspace_amenities WHERE amenity_id = 'A1');
+
+INSERT INTO workspace_amenities (amenity_id, workspace_id, amenity_name)
+SELECT 'A2', 'W1', 'Meeting Booths'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM workspace_amenities WHERE amenity_id = 'A2');
+
+INSERT INTO workspace_amenities (amenity_id, workspace_id, amenity_name)
+SELECT 'A3', 'W2', 'Conference Screen'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM workspace_amenities WHERE amenity_id = 'A3');
+
+INSERT INTO workspace_amenities (amenity_id, workspace_id, amenity_name)
+SELECT 'A4', 'W6', 'Coffee Bar'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM workspace_amenities WHERE amenity_id = 'A4');
+
+INSERT INTO workspace_amenities (amenity_id, workspace_id, amenity_name)
+SELECT 'A5', 'W11', '24x7 Access'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM workspace_amenities WHERE amenity_id = 'A5');
+
+INSERT INTO workspace_amenities (amenity_id, workspace_id, amenity_name)
+SELECT 'A6', 'W13', 'Phone Booth'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM workspace_amenities WHERE amenity_id = 'A6');
+
+INSERT INTO workspace_reviews (review_id, workspace_id, user_id, rating, review_text, reviewed_on)
+SELECT 'R1', 'W1', 'U1', 5, 'Great location, smooth check-in, and reliable internet.', '2026-05-01 10:00:00'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM workspace_reviews WHERE review_id = 'R1');
+
+INSERT INTO workspace_reviews (review_id, workspace_id, user_id, rating, review_text, reviewed_on)
+SELECT 'R2', 'W3', 'U2', 4, 'Quiet workspace with good seating and easy parking.', '2026-05-03 14:30:00'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM workspace_reviews WHERE review_id = 'R2');
+
+INSERT INTO workspace_reviews (review_id, workspace_id, user_id, rating, review_text, reviewed_on)
+SELECT 'R3', 'W13', 'U1', 5, 'Perfect for team sessions and the staff was helpful.', '2026-05-05 11:15:00'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM workspace_reviews WHERE review_id = 'R3');
+
+INSERT INTO workspace_reviews (review_id, workspace_id, user_id, rating, review_text, reviewed_on)
+SELECT 'R4', 'W21', 'U2', 4, 'Nice ambience and good connectivity for meetings.', '2026-05-06 16:45:00'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM workspace_reviews WHERE review_id = 'R4');
